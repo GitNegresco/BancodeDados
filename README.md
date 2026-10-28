@@ -4,4 +4,4 @@ Trabalho do 2° semestre de SGBDR
 - Modelo lógico - Chris
 - Modelo Físico - Jão
 - Página HTML - Felipe
-- DATA DA ENTREGA: 17/11 (verificar)
+- DATA DA ENTREGA: 17/11
