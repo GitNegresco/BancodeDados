@@ -12,9 +12,21 @@ class DemoExperienceTests(TestCase):
     def test_dashboard_renders_project_sections(self):
         response = self.client.get(reverse("home"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Proposta")
-        self.assertContains(response, "Dicionário de dados")
-        self.assertContains(response, "Apresentação")
+        for page in (
+            "inicio",
+            "proposta",
+            "modelagem",
+            "dicionario",
+            "scripts",
+            "consultas",
+        ):
+            with self.subTest(page=page):
+                self.assertContains(response, f'data-page="{page}"')
+        self.assertContains(response, "Dez tabelas do modelo relacional SQL")
+        self.assertContains(response, "Popular a demonstração Django")
+        self.assertContains(response, "banco da demonstração Django")
+        self.assertNotContains(response, "Apresentação")
+        self.assertNotContains(response, 'data-page="apresentacao"')
 
     def test_seed_loads_exactly_one_hundred_related_records(self):
         self.assertEqual(
