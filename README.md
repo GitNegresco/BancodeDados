@@ -12,6 +12,25 @@ python manage.py runserver
 
 Abra `http://127.0.0.1:8000/`. A página **Scripts de criação e carga** explica a estrutura e a carga de demonstração.
 
+## Deploy na Vercel
+
+O projeto usa a detecção automática de Django da Vercel. Importe este repositório
+com a raiz do projeto (`./`) como diretório raiz e mantenha o preset Django
+detectado automaticamente. A Vercel instala `requirements.txt` e coleta os
+arquivos estáticos usando `STATIC_ROOT`.
+
+Antes do deploy, configure `DJANGO_SECRET_KEY` nas variáveis de ambiente do
+projeto Vercel para os ambientes Production e Preview. Gere um valor secreto,
+por exemplo com `openssl rand -base64 48`; não o adicione ao repositório. Para
+usar um domínio personalizado, configure também `DJANGO_ALLOWED_HOSTS` com os
+hosts separados por vírgula, sem `https://`. Os domínios `*.vercel.app` já são
+permitidos.
+
+O banco SQLite incluído contém os 100 registros fictícios e serve para a
+demonstração de leitura e consultas. O armazenamento local das funções Vercel
+não é persistente; para guardar alterações entre execuções, configure um banco
+gerenciado antes de habilitar gravações em produção.
+
 ## Carga de demonstração
 
 Carregue os dados pelo botão no cabeçalho ou pelo comando:
