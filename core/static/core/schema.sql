@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS Contratos (
   fk_Cliente INTEGER NOT NULL,
   Data_Contrato DATE NOT NULL,
   Valor_Total DECIMAL(10,2) NOT NULL CHECK (Valor_Total >= 0),
-  Despesas_Contratante DECIMAL(10,2) NOT NULL DEFAULT 0,
+  Despesas_Contratante DECIMAL(10,2) DEFAULT 0 CHECK (Despesas_Contratante >= 0),
   Quilometragem_Estimada DECIMAL(8,2),
   Status VARCHAR(15) NOT NULL DEFAULT 'aberto'
     CHECK (Status IN ('aberto','concluido','cancelado')),
@@ -98,3 +98,6 @@ CREATE TABLE IF NOT EXISTS Escalas (
   CHECK (Data_Saida IS NULL OR Data_Chegada IS NULL OR Data_Saida >= Data_Chegada),
   FOREIGN KEY (fk_Viagem) REFERENCES Viagens(Id_Viagem) ON DELETE CASCADE
 );
+
+CREATE INDEX IF NOT EXISTS idx_viagens_data_saida ON Viagens(Data_Saida);
+CREATE INDEX IF NOT EXISTS idx_vm_motorista_viagem ON Viagem_Motorista(fk_Motorista, fk_Viagem);

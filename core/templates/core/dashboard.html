@@ -18,7 +18,6 @@
       <button class="nav-link" data-page-link="dicionario">Dicionário</button>
       <button class="nav-link" data-page-link="scripts">Scripts</button>
       <button class="nav-link" data-page-link="consultas">Consultas</button>
-      <button class="nav-link" data-page-link="apresentacao">Apresentação</button>
     </nav>
   </header>
 
@@ -63,69 +62,64 @@
     </section>
 
     <section class="page-section" data-page="modelagem" hidden>
-      <div class="page-heading"><p class="eyebrow">02 · ESTRUTURA</p><h1>Modelagem do banco</h1><p>Dez estruturas físicas: seis entidades principais, uma tabela de contatos e três relacionamentos especializados.</p></div>
+      <div class="page-heading"><p class="eyebrow">02 · ESTRUTURA</p><h1>Modelagem do banco</h1><p>Dez tabelas do modelo relacional SQL: sete entidades, uma tabela de e-mails e duas tabelas associativas.</p></div>
       <article class="card">
         <div class="model-grid">
           <div class="entity"><b>CLIENTES</b><span>PK · Id_Cliente</span><span>Nome · Documento · Tipo_Pessoa</span><span>Telefone · Endereco</span></div>
           <div class="entity"><b>CLIENTE_EMAIL</b><span>PK · Id_Email</span><span>FK · fk_Cliente</span><span>Email · único por cliente</span></div>
-          <div class="entity"><b>CONTRATOS</b><span>PK · Id_Contrato</span><span>FK · fk_Cliente</span><span>Data · Valor · Status</span></div>
-          <div class="entity"><b>PAGAMENTOS</b><span>PK · Id_Pagamento</span><span>FK · fk_Contrato</span><span>Data · Valor · Metodo</span></div>
-          <div class="entity"><b>VIAGENS</b><span>PK · Id_Viagem</span><span>FK · fk_Contrato</span><span>Origem · Destino · Km_Real</span></div>
+          <div class="entity"><b>CONTRATOS</b><span>PK · Id_Contrato</span><span>FK · fk_Cliente</span><span>Data · Valores · Km estimada · Status</span></div>
+          <div class="entity"><b>PAGAMENTOS</b><span>PK · Id_Pagamento</span><span>FK · fk_Contrato</span><span>Data · Valor positivo · Metodo</span></div>
+          <div class="entity"><b>VIAGENS</b><span>PK · Id_Viagem</span><span>FK · fk_Contrato</span><span>Origem · Destino · Datas · Km_Real</span></div>
           <div class="entity"><b>MOTORISTAS</b><span>PK · CPF</span><span>Nome · CNH único</span><span>Telefone · Endereco</span></div>
-          <div class="entity"><b>VEICULOS</b><span>PK · Placa</span><span>Ano · Marca · Modelo</span><span>Tanque · Lotacao · Renavam</span></div>
-          <div class="entity"><b>VIAGEM_MOTORISTA</b><span>PK composta</span><span>FK · fk_Viagem</span><span>FK · fk_Motorista · Papel</span></div>
+          <div class="entity"><b>VEICULOS</b><span>PK · Placa</span><span>Ano · Marca · Modelo</span><span>Tanque · Lotacao · Renavam único</span></div>
+          <div class="entity"><b>VIAGEM_MOTORISTA</b><span>PK composta</span><span>FK · fk_Viagem</span><span>FK · fk_Motorista · Papel principal</span></div>
           <div class="entity"><b>VIAGEM_VEICULO</b><span>PK composta</span><span>FK · fk_Viagem</span><span>FK · fk_Veiculo</span></div>
-          <div class="entity"><b>ESCALAS</b><span>PK · Id_Escala</span><span>FK · fk_Viagem</span><span>Ordem · Local · Quilometragem</span></div>
+          <div class="entity"><b>ESCALAS</b><span>PK · Id_Escala</span><span>FK · fk_Viagem</span><span>Ordem única · Local · Datas · Km</span></div>
         </div>
-        <p class="note">PK = chave primária · FK = chave estrangeira. Clientes possuem e-mails e contratos; viagens usam associações N:N com motoristas e veículos.</p>
+        <p class="note">PK = chave primária · FK = chave estrangeira. Clientes possuem e-mails e contratos; contratos possuem pagamentos e viagens; viagens usam associações N:N com motoristas e veículos e podem ter várias escalas.</p>
       </article>
       <div class="content-grid three">
-        <article class="card"><h2>Cliente → Contrato → Pagamento</h2><p>Um cliente possui contratos e cada contrato concentra seus pagamentos.</p></article>
-        <article class="card"><h2>Contrato → Viagem</h2><p>A viagem registra roteiro, datas e quilômetros reais do contrato executado.</p></article>
-        <article class="card"><h2>Viagem → Responsáveis e escalas</h2><p>Tabelas associativas vinculam motoristas e veículos; escalas detalham paradas e horários.</p></article>
+        <article class="card"><h2>Cliente → E-mails e contratos</h2><p>Um cliente pode ter vários e-mails e contratos; cada e-mail é único dentro do cliente.</p></article>
+        <article class="card"><h2>Contrato → Pagamentos e viagens</h2><p>Pagamentos e viagens referenciam o contrato; a exclusão do cliente ou contrato é protegida por RESTRICT.</p></article>
+        <article class="card"><h2>Viagem → Equipe, frota e escalas</h2><p>Motoristas e veículos se associam por chaves compostas; escalas têm ordem única dentro da viagem.</p></article>
       </div>
     </section>
 
     <section class="page-section" data-page="dicionario" hidden>
-      <div class="page-heading"><p class="eyebrow">03 · REFERÊNCIA</p><h1>Dicionário de dados</h1><p>Principais campos, tipos e regras de cada entidade.</p></div>
+      <div class="page-heading"><p class="eyebrow">03 · REFERÊNCIA</p><h1>Dicionário de dados</h1><p>Campos, tipos, chaves e restrições do modelo relacional SQL de 10 tabelas.</p></div>
       <article class="card table-card"><h2>Clientes, contatos e contratos</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>TABELA</th><th>CAMPO</th><th>TIPO / REGRA</th><th>DESCRIÇÃO</th></tr></thead><tbody>
-        <tr><td>Clientes</td><td>Id_Cliente</td><td>INT · PK · AUTO_INCREMENT</td><td>Identificador do cliente</td></tr><tr><td>Clientes</td><td>Nome</td><td>VARCHAR(100) · NOT NULL</td><td>Nome do cliente</td></tr><tr><td>Clientes</td><td>Documento</td><td>VARCHAR(14) · NOT NULL · único</td><td>CPF ou CNPJ</td></tr><tr><td>Clientes</td><td>Tipo_Pessoa</td><td>CHAR(2) · PF ou PJ</td><td>Tipo jurídico da pessoa</td></tr><tr><td>Cliente_Email</td><td>fk_Cliente</td><td>INT · FK · CASCADE</td><td>Cliente associado ao e-mail</td></tr><tr><td>Cliente_Email</td><td>Email</td><td>VARCHAR(150) · NOT NULL</td><td>E-mail, exclusivo em combinação com o cliente</td></tr><tr><td>Contratos</td><td>fk_Cliente</td><td>INT · FK · RESTRICT</td><td>Cliente contratante</td></tr><tr><td>Contratos</td><td>Valor_Total, Despesas_Contratante</td><td>DECIMAL(10,2)</td><td>Valores financeiros e despesas</td></tr><tr><td>Contratos</td><td>Status</td><td>VARCHAR(15)</td><td>aberto, concluido ou cancelado</td></tr>
+        <tr><td>Clientes</td><td>Id_Cliente</td><td>INT · PK · AUTO_INCREMENT</td><td>Identificador do cliente</td></tr><tr><td>Clientes</td><td>Nome</td><td>VARCHAR(100) · NOT NULL</td><td>Nome ou razão social</td></tr><tr><td>Clientes</td><td>Documento</td><td>VARCHAR(14) · NOT NULL · UNIQUE</td><td>CPF ou CNPJ</td></tr><tr><td>Clientes</td><td>Tipo_Pessoa</td><td>CHAR(2) · CHECK PF/PJ</td><td>Tipo de pessoa</td></tr><tr><td>Clientes</td><td>Telefone</td><td>VARCHAR(15)</td><td>Telefone de contato</td></tr><tr><td>Clientes</td><td>Endereco</td><td>VARCHAR(255)</td><td>Endereço do cliente</td></tr>
+        <tr><td>Cliente_Email</td><td>Id_Email</td><td>INT · PK · AUTO_INCREMENT</td><td>Identificador do e-mail</td></tr><tr><td>Cliente_Email</td><td>fk_Cliente</td><td>INT · FK · NOT NULL · CASCADE</td><td>Cliente associado</td></tr><tr><td>Cliente_Email</td><td>Email</td><td>VARCHAR(150) · NOT NULL · UNIQUE por cliente</td><td>E-mail de contato</td></tr>
+        <tr><td>Contratos</td><td>Id_Contrato</td><td>INT · PK · AUTO_INCREMENT</td><td>Identificador do contrato</td></tr><tr><td>Contratos</td><td>fk_Cliente</td><td>INT · FK · NOT NULL · RESTRICT</td><td>Cliente contratante</td></tr><tr><td>Contratos</td><td>Data_Contrato</td><td>DATE · NOT NULL</td><td>Data de formalização</td></tr><tr><td>Contratos</td><td>Valor_Total</td><td>DECIMAL(10,2) · NOT NULL · CHECK ≥ 0</td><td>Valor total contratado</td></tr><tr><td>Contratos</td><td>Despesas_Contratante</td><td>DECIMAL(10,2) · DEFAULT 0 · CHECK ≥ 0</td><td>Despesas atribuídas ao contratante</td></tr><tr><td>Contratos</td><td>Quilometragem_Estimada</td><td>DECIMAL(8,2)</td><td>Distância estimada</td></tr><tr><td>Contratos</td><td>Status</td><td>VARCHAR(15) · DEFAULT aberto</td><td>aberto, concluido ou cancelado</td></tr>
       </tbody></table></div></article>
-      <article class="card table-card"><h2>Pagamentos, operações e relacionamentos</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>TABELA</th><th>CAMPO</th><th>TIPO / REGRA</th><th>DESCRIÇÃO</th></tr></thead><tbody>
-        <tr><td>Pagamentos</td><td>fk_Contrato, Valor, Metodo</td><td>INT · FK / DECIMAL / VARCHAR</td><td>Pagamento vinculado ao contrato</td></tr><tr><td>Motoristas</td><td>CPF, CNH</td><td>VARCHAR(11) · PK / único</td><td>Identificação do motorista</td></tr><tr><td>Veiculos</td><td>Placa, Renavam</td><td>VARCHAR · PK / único</td><td>Identificação e cadastro do veículo</td></tr><tr><td>Viagens</td><td>fk_Contrato</td><td>INT · FK · RESTRICT</td><td>Contrato executado pela viagem</td></tr><tr><td>Viagens</td><td>Origem, Destino, Km_Real</td><td>VARCHAR / DECIMAL(8,2)</td><td>Roteiro e distância real</td></tr><tr><td>Viagem_Motorista</td><td>fk_Viagem, fk_Motorista</td><td>PK composta · CASCADE / RESTRICT</td><td>Motoristas associados à viagem</td></tr><tr><td>Viagem_Veiculo</td><td>fk_Viagem, fk_Veiculo</td><td>PK composta · CASCADE / RESTRICT</td><td>Veículos associados à viagem</td></tr><tr><td>Escalas</td><td>fk_Viagem, Ordem</td><td>INT · FK / único por viagem</td><td>Parada ordenada da viagem</td></tr><tr><td>Escalas</td><td>Local, Quilometragem, Datas</td><td>VARCHAR / DECIMAL / DATETIME</td><td>Local e horário da escala</td></tr>
+      <article class="card table-card"><h2>Pagamentos, motoristas e veículos</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>TABELA</th><th>CAMPO</th><th>TIPO / REGRA</th><th>DESCRIÇÃO</th></tr></thead><tbody>
+        <tr><td>Pagamentos</td><td>Id_Pagamento</td><td>INT · PK · AUTO_INCREMENT</td><td>Identificador do pagamento</td></tr><tr><td>Pagamentos</td><td>fk_Contrato</td><td>INT · FK · NOT NULL · RESTRICT</td><td>Contrato relacionado</td></tr><tr><td>Pagamentos</td><td>Data_Pagamento</td><td>DATE · NOT NULL</td><td>Data do pagamento</td></tr><tr><td>Pagamentos</td><td>Valor</td><td>DECIMAL(10,2) · NOT NULL · CHECK &gt; 0</td><td>Valor pago</td></tr><tr><td>Pagamentos</td><td>Metodo</td><td>VARCHAR(50) · NOT NULL</td><td>Meio de pagamento</td></tr>
+        <tr><td>Motoristas</td><td>CPF</td><td>VARCHAR(11) · PK</td><td>Identificador do motorista</td></tr><tr><td>Motoristas</td><td>Nome</td><td>VARCHAR(100) · NOT NULL</td><td>Nome do motorista</td></tr><tr><td>Motoristas</td><td>CNH</td><td>VARCHAR(11) · NOT NULL · UNIQUE</td><td>Carteira Nacional de Habilitação</td></tr><tr><td>Motoristas</td><td>Telefone</td><td>VARCHAR(15)</td><td>Telefone de contato</td></tr><tr><td>Motoristas</td><td>Endereco</td><td>VARCHAR(255)</td><td>Endereço do motorista</td></tr>
+        <tr><td>Veiculos</td><td>Placa</td><td>VARCHAR(7) · PK</td><td>Identificador do veículo</td></tr><tr><td>Veiculos</td><td>Ano</td><td>INT · NOT NULL</td><td>Ano de fabricação</td></tr><tr><td>Veiculos</td><td>Modelo, Marca</td><td>VARCHAR(50) · NOT NULL</td><td>Modelo e fabricante</td></tr><tr><td>Veiculos</td><td>Tanque</td><td>DECIMAL(5,2) · CHECK &gt; 0</td><td>Capacidade do tanque</td></tr><tr><td>Veiculos</td><td>Lotacao</td><td>INT · NOT NULL · CHECK &gt; 0</td><td>Capacidade de passageiros</td></tr><tr><td>Veiculos</td><td>Renavam</td><td>VARCHAR(11) · NOT NULL · UNIQUE</td><td>Registro do veículo</td></tr>
+      </tbody></table></div></article>
+      <article class="card table-card"><h2>Viagens, associações e escalas</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>TABELA</th><th>CAMPO</th><th>TIPO / REGRA</th><th>DESCRIÇÃO</th></tr></thead><tbody>
+        <tr><td>Viagens</td><td>Id_Viagem</td><td>INT · PK · AUTO_INCREMENT</td><td>Identificador da viagem</td></tr><tr><td>Viagens</td><td>fk_Contrato</td><td>INT · FK · NOT NULL · RESTRICT</td><td>Contrato executado</td></tr><tr><td>Viagens</td><td>Origem, Destino</td><td>VARCHAR(150) · NOT NULL</td><td>Locais de saída e destino</td></tr><tr><td>Viagens</td><td>Data_Saida</td><td>DATETIME · NOT NULL</td><td>Data e horário de saída</td></tr><tr><td>Viagens</td><td>Data_Retorno</td><td>DATETIME · CHECK ≥ Data_Saida</td><td>Data e horário de retorno, opcional</td></tr><tr><td>Viagens</td><td>Km_Real</td><td>DECIMAL(8,2)</td><td>Distância efetivamente percorrida</td></tr><tr><td>Viagens</td><td>Observacoes</td><td>TEXT</td><td>Informações adicionais</td></tr>
+        <tr><td>Viagem_Motorista</td><td>fk_Viagem, fk_Motorista</td><td>PK composta · CASCADE / RESTRICT</td><td>Motoristas vinculados à viagem</td></tr><tr><td>Viagem_Motorista</td><td>Papel</td><td>VARCHAR(20) · DEFAULT principal</td><td>Função do motorista na viagem</td></tr><tr><td>Viagem_Veiculo</td><td>fk_Viagem, fk_Veiculo</td><td>PK composta · CASCADE / RESTRICT</td><td>Veículos vinculados à viagem</td></tr>
+        <tr><td>Escalas</td><td>Id_Escala</td><td>INT · PK · AUTO_INCREMENT</td><td>Identificador da escala</td></tr><tr><td>Escalas</td><td>fk_Viagem</td><td>INT · FK · NOT NULL · CASCADE</td><td>Viagem relacionada</td></tr><tr><td>Escalas</td><td>Ordem</td><td>INT · NOT NULL · UNIQUE por viagem</td><td>Posição da parada na rota</td></tr><tr><td>Escalas</td><td>Local</td><td>VARCHAR(150) · NOT NULL</td><td>Local da parada</td></tr><tr><td>Escalas</td><td>Quilometragem</td><td>DECIMAL(8,2) · CHECK ≥ 0</td><td>Distância da escala</td></tr><tr><td>Escalas</td><td>Data_Chegada, Data_Saida</td><td>DATETIME · CHECK de ordem</td><td>Horários da parada</td></tr>
       </tbody></table></div></article>
     </section>
 
     <section class="page-section" data-page="scripts" hidden>
-      <div class="page-heading"><p class="eyebrow">04 · PREPARAÇÃO</p><h1>Scripts de criação e carga</h1><p>Comandos simples para preparar o banco e iniciar a demonstração.</p></div>
+      <div class="page-heading"><p class="eyebrow">04 · PREPARAÇÃO</p><h1>Scripts de criação e carga</h1><p>O DDL SQL de 10 tabelas e a carga da aplicação Django são recursos separados.</p></div>
       <div class="content-grid">
-        <article class="card"><span class="step">1</span><h2>Criar as tabelas</h2><p>O modelo físico define dez estruturas, incluindo pagamentos, contatos e associações N:N.</p><pre>CREATE TABLE Clientes ...</pre><a class="text-link" href="{% static 'core/schema.sql' %}" download>Baixar o script do modelo físico</a></article>
-        <article class="card"><span class="step">2</span><h2>Carregar dados fictícios</h2><p>Insere os registros de exemplo no banco vazio. A carga não apaga nem duplica dados.</p><pre>python manage.py seed_demo</pre><button class="button button-primary" id="load-data-secondary">Carregar pela página</button></article>
+        <article class="card"><span class="step">1</span><h2>Criar as tabelas SQL</h2><p>O DDL cria as dez tabelas do modelo relacional em SQLite, incluindo pagamentos, contatos e associações N:N.</p><pre>CREATE TABLE Clientes ...</pre><a class="text-link" href="{% static 'core/schema.sql' %}" download>Baixar o DDL SQLite do modelo relacional</a></article>
+        <article class="card"><span class="step">2</span><h2>Popular a demonstração Django</h2><p>Este comando popula o banco usado pela aplicação Django. Ele não carrega os dados no DDL SQL de dez tabelas.</p><pre>python manage.py seed_demo</pre><button class="button button-primary" id="load-data-secondary">Carregar pela página</button></article>
       </div>
-      <article class="card"><h2>Distribuição dos 100 registros</h2><div class="seed-grid"><span>10 clientes</span><span>15 contratos</span><span>20 motoristas</span><span>15 veículos</span><span>20 viagens</span><span>20 escalas</span></div></article>
+      <article class="card"><h2>Distribuição da carga Django (100 registros)</h2><div class="seed-grid"><span>10 clientes</span><span>15 contratos</span><span>20 motoristas</span><span>15 veículos</span><span>20 viagens</span><span>20 escalas</span></div></article>
     </section>
 
     <section class="page-section" data-page="consultas" hidden>
-      <div class="page-heading"><p class="eyebrow">05 · EXPLORAÇÃO</p><h1>Consultas e validações</h1><p>Escolha uma consulta para executá-la no banco de dados.</p></div>
+      <div class="page-heading"><p class="eyebrow">05 · EXPLORAÇÃO</p><h1>Consultas e validações</h1><p>As consultas interativas executam somente leitura no banco da demonstração Django.</p></div>
       <div class="query-layout">
         <div class="query-list">{% for query in queries %}<button class="query-button" data-query="{{ query.id }}"><span>{{ query.id|stringformat:"02d" }}</span><b>{{ query.title }}</b><i>→</i></button>{% endfor %}</div>
         <article class="card query-panel"><div class="query-heading"><div><p class="eyebrow">RESULTADO</p><h2 id="query-title">Selecione uma consulta</h2></div><span id="query-status" class="status">PRONTO</span></div><p id="query-description">Os resultados aparecem aqui após a execução.</p><pre id="query-sql" hidden><code></code></pre><div id="query-result"><p class="empty">Selecione uma das dez consultas ao lado.</p></div><p class="note" id="query-count"></p></article>
       </div>
-      <article class="card"><h2>Validações</h2><ul class="validation-list"><li>Documentos e identificadores únicos.</li><li>Relacionamentos protegidos por chaves estrangeiras.</li><li>Carga de demonstração permitida apenas em banco vazio.</li><li>Consultas SQL predefinidas e somente leitura.</li></ul><a class="text-link" href="{% static 'core/consultas.sql' %}" download>Baixar as 10 consultas SQL</a></article>
-    </section>
-
-    <section class="page-section" data-page="apresentacao" hidden>
-      <div class="page-heading"><p class="eyebrow">06 · ROTEIRO</p><h1>Apresentação e demonstração</h1><p>Uma sequência rápida para explicar e demonstrar o trabalho.</p></div>
-      <article class="card">
-        <ol class="presentation-list">
-          <li><b>Apresente a proposta</b><span>Explique o problema de organizar dados de transporte.</span></li>
-          <li><b>Mostre a modelagem</b><span>Apresente as dez estruturas físicas e seus relacionamentos.</span></li>
-          <li><b>Carregue os dados</b><span>Use os 100 registros fictícios para popular o banco.</span></li>
-          <li><b>Execute uma consulta</b><span>Exiba uma rota, um motorista ou os indicadores gerais.</span></li>
-          <li><b>Encerre com as validações</b><span>Comente as chaves únicas e estrangeiras.</span></li>
-        </ol>
-        <button id="start-demo" class="button button-primary">Começar demonstração</button>
-      </article>
+      <article class="card"><h2>Validações</h2><ul class="validation-list"><li>Documentos e identificadores únicos.</li><li>Relacionamentos protegidos por chaves estrangeiras.</li><li>Carga de demonstração permitida apenas em banco vazio.</li><li>Consultas SQL predefinidas e somente leitura.</li></ul><a class="text-link" href="{% static 'core/consultas.sql' %}" download>Baixar as 10 consultas da demonstração Django</a></article>
     </section>
 
   </main>
@@ -135,8 +129,7 @@
   <script>
     const titles = {
       inicio: "Início", proposta: "Proposta", modelagem: "Modelagem",
-      dicionario: "Dicionário", scripts: "Scripts", consultas: "Consultas",
-      apresentacao: "Apresentação"
+      dicionario: "Dicionário", scripts: "Scripts", consultas: "Consultas"
     };
     const showToast = (message, isError = false) => {
       const toast = document.querySelector("#toast");
@@ -182,15 +175,6 @@
 
     document.querySelector("#load-data").addEventListener("click", loadDemo);
     document.querySelector("#load-data-secondary").addEventListener("click", loadDemo);
-    document.querySelector("#start-demo").addEventListener("click", () => {
-      if (!{{ totals.viagens }}) {
-        loadDemo();
-        return;
-      }
-      document.querySelector('[data-page-link="consultas"]').click();
-      window.setTimeout(() => document.querySelector('[data-query="10"]').click(), 150);
-    });
-
     document.querySelector("#trip-search").addEventListener("input", (event) => {
       const term = event.target.value.toLocaleLowerCase("pt-BR");
       document.querySelectorAll("#trip-rows tr").forEach((row) => {
