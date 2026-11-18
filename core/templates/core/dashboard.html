@@ -4,13 +4,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Apresentação interativa do banco de dados de logística.">
-  <title>Rota Clara | Banco de dados</title>
+  <meta name="description" content="Sistema de gestão e consultas para operações de logística e transporte.">
+  <title>Rota Clara | Gestão de logística</title>
   <link rel="stylesheet" href="{% static 'core/app.css' %}">
 </head>
 <body>
   <header class="site-header">
-    <a class="brand" href="#" data-page-link="inicio"><span class="brand-icon">RC</span><span>Rota Clara<small>PROJETO DE BANCO DE DADOS</small></span></a>
+    <a class="brand" href="#" data-page-link="inicio"><span class="brand-icon">RC</span><span>Rota Clara<small>GESTÃO DE LOGÍSTICA</small></span></a>
     <nav class="main-nav" aria-label="Seções do projeto">
       <button class="nav-link active" data-page-link="inicio">Início</button>
       <button class="nav-link" data-page-link="proposta">Proposta</button>
@@ -56,50 +56,50 @@
     <section class="page-section" data-page="proposta" hidden>
       <div class="page-heading"><p class="eyebrow">01 · CONTEXTO</p><h1>Proposta e requisitos</h1><p>O que o projeto pretende resolver e quais funções o sistema precisa oferecer.</p></div>
       <div class="content-grid">
-        <article class="card"><h2>Proposta</h2><p>Organizar em um único banco as informações usadas em uma operação de transporte: clientes, contratos, motoristas, veículos, viagens e escalas.</p><div class="highlight"><b>Objetivo</b><br>Facilitar o controle das rotas e a consulta de informações da operação.</div></article>
-        <article class="card"><h2>Requisitos funcionais</h2><ul><li>Cadastrar clientes e contratos.</li><li>Manter os dados dos motoristas e veículos.</li><li>Registrar origem, destino e data de cada viagem.</li><li>Associar cada viagem a um contrato, motorista e veículo.</li><li>Consultar paradas, distâncias e valores.</li></ul></article>
-        <article class="card"><h2>Requisitos e regras</h2><ul><li>Identificadores únicos para documentos e veículos.</li><li>Relacionamentos protegidos por chaves estrangeiras.</li><li>Um cliente pode ter vários contratos.</li><li>Um contrato pode gerar várias viagens.</li><li>Uma viagem pode ter várias escalas.</li></ul></article>
+        <article class="card"><h2>Proposta</h2><p>Organizar em um único banco os dados de clientes, contatos, contratos, pagamentos, motoristas, veículos, viagens e escalas de uma operação de transporte.</p><div class="highlight"><b>Objetivo</b><br>Rastrear contratos e pagamentos, planejar rotas e registrar motoristas, veículos e paradas de cada viagem.</div></article>
+        <article class="card"><h2>Requisitos funcionais</h2><ul><li>Cadastrar pessoas físicas ou jurídicas e seus documentos.</li><li>Manter vários e-mails por cliente e vários contratos por cliente.</li><li>Registrar contratos, status, valores, despesas e quilometragem estimada.</li><li>Controlar pagamentos e relacioná-los aos contratos.</li><li>Associar uma viagem a vários motoristas e veículos por meio de tabelas associativas.</li><li>Registrar origem, destino, datas, quilômetros reais e escalas.</li></ul></article>
+        <article class="card"><h2>Requisitos e regras</h2><ul><li>Documento do cliente, CPF/CNH do motorista, placa e Renavam devem ser únicos.</li><li>Cliente e contrato utilizam chave estrangeira; exclusões seguem regras RESTRICT ou CASCADE.</li><li>Um cliente pode possuir vários e-mails e contratos.</li><li>Um contrato pode ter pagamentos e várias viagens.</li><li>Viagens podem ter vários motoristas e veículos, mas cada associação é única.</li><li>Escalas têm uma ordem única dentro de cada viagem.</li></ul></article>
       </div>
     </section>
 
     <section class="page-section" data-page="modelagem" hidden>
-      <div class="page-heading"><p class="eyebrow">02 · ESTRUTURA</p><h1>Modelagem do banco</h1><p>Seis entidades conectadas por relacionamentos um-para-muitos.</p></div>
+      <div class="page-heading"><p class="eyebrow">02 · ESTRUTURA</p><h1>Modelagem do banco</h1><p>Dez estruturas físicas: seis entidades principais, uma tabela de contatos e três relacionamentos especializados.</p></div>
       <article class="card">
         <div class="model-grid">
-          <div class="entity"><b>CLIENTE</b><span>PK · id</span><span>nome · CPF/CNPJ</span><span>telefone · pagamento</span></div>
-          <div class="relation"><b>1 → N</b><span>possui</span></div>
-          <div class="entity"><b>CONTRATO</b><span>PK · id</span><span>FK · cliente_id</span><span>valores · estimativa</span></div>
-          <div class="relation"><b>1 → N</b><span>gera</span></div>
-          <div class="entity"><b>VIAGEM</b><span>PK · id</span><span>FK · contrato_id</span><span>FK · motorista_id</span><span>FK · veiculo_id</span></div>
-          <div class="relation"><b>1 → N</b><span>inclui</span></div>
-          <div class="entity"><b>ESCALA</b><span>PK · id</span><span>FK · viagem_id</span><span>paradas · quilometragem</span></div>
-          <div class="entity secondary"><b>MOTORISTA</b><span>PK · id</span><span>CPF · CNH</span></div>
-          <div class="relation"><b>1 → N</b><span>conduz</span></div>
-          <div class="entity secondary"><b>VEÍCULO</b><span>PK · id</span><span>placa · Renavam</span></div>
+          <div class="entity"><b>CLIENTES</b><span>PK · Id_Cliente</span><span>Nome · Documento · Tipo_Pessoa</span><span>Telefone · Endereco</span></div>
+          <div class="entity"><b>CLIENTE_EMAIL</b><span>PK · Id_Email</span><span>FK · fk_Cliente</span><span>Email · único por cliente</span></div>
+          <div class="entity"><b>CONTRATOS</b><span>PK · Id_Contrato</span><span>FK · fk_Cliente</span><span>Data · Valor · Status</span></div>
+          <div class="entity"><b>PAGAMENTOS</b><span>PK · Id_Pagamento</span><span>FK · fk_Contrato</span><span>Data · Valor · Metodo</span></div>
+          <div class="entity"><b>VIAGENS</b><span>PK · Id_Viagem</span><span>FK · fk_Contrato</span><span>Origem · Destino · Km_Real</span></div>
+          <div class="entity"><b>MOTORISTAS</b><span>PK · CPF</span><span>Nome · CNH único</span><span>Telefone · Endereco</span></div>
+          <div class="entity"><b>VEICULOS</b><span>PK · Placa</span><span>Ano · Marca · Modelo</span><span>Tanque · Lotacao · Renavam</span></div>
+          <div class="entity"><b>VIAGEM_MOTORISTA</b><span>PK composta</span><span>FK · fk_Viagem</span><span>FK · fk_Motorista · Papel</span></div>
+          <div class="entity"><b>VIAGEM_VEICULO</b><span>PK composta</span><span>FK · fk_Viagem</span><span>FK · fk_Veiculo</span></div>
+          <div class="entity"><b>ESCALAS</b><span>PK · Id_Escala</span><span>FK · fk_Viagem</span><span>Ordem · Local · Quilometragem</span></div>
         </div>
-        <p class="note">PK = chave primária · FK = chave estrangeira. Um motorista e um veículo podem estar associados a várias viagens.</p>
+        <p class="note">PK = chave primária · FK = chave estrangeira. Clientes possuem e-mails e contratos; viagens usam associações N:N com motoristas e veículos.</p>
       </article>
       <div class="content-grid three">
-        <article class="card"><h2>Cliente → Contrato</h2><p>O contrato registra o acordo com o cliente e seus valores.</p></article>
-        <article class="card"><h2>Contrato → Viagem</h2><p>As viagens executam o transporte previsto no contrato.</p></article>
-        <article class="card"><h2>Viagem → Escala</h2><p>As escalas detalham paradas e distâncias da viagem.</p></article>
+        <article class="card"><h2>Cliente → Contrato → Pagamento</h2><p>Um cliente possui contratos e cada contrato concentra seus pagamentos.</p></article>
+        <article class="card"><h2>Contrato → Viagem</h2><p>A viagem registra roteiro, datas e quilômetros reais do contrato executado.</p></article>
+        <article class="card"><h2>Viagem → Responsáveis e escalas</h2><p>Tabelas associativas vinculam motoristas e veículos; escalas detalham paradas e horários.</p></article>
       </div>
     </section>
 
     <section class="page-section" data-page="dicionario" hidden>
       <div class="page-heading"><p class="eyebrow">03 · REFERÊNCIA</p><h1>Dicionário de dados</h1><p>Principais campos, tipos e regras de cada entidade.</p></div>
-      <article class="card table-card"><h2>Cliente e contrato</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>TABELA</th><th>CAMPO</th><th>TIPO / REGRA</th><th>DESCRIÇÃO</th></tr></thead><tbody>
-        <tr><td>Cliente</td><td>id</td><td>INTEGER · PK</td><td>Identificador do cliente</td></tr><tr><td>Cliente</td><td>cpf_cnpj</td><td>VARCHAR(14) · único</td><td>Documento do cliente</td></tr><tr><td>Cliente</td><td>nome, telefone</td><td>VARCHAR</td><td>Dados de contato</td></tr><tr><td>Contrato</td><td>cliente_id</td><td>INTEGER · FK</td><td>Cliente relacionado</td></tr><tr><td>Contrato</td><td>valor_total</td><td>DECIMAL(10,2)</td><td>Valor acordado</td></tr><tr><td>Contrato</td><td>quilometragem_estimada</td><td>FLOAT</td><td>Distância prevista</td></tr>
+      <article class="card table-card"><h2>Clientes, contatos e contratos</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>TABELA</th><th>CAMPO</th><th>TIPO / REGRA</th><th>DESCRIÇÃO</th></tr></thead><tbody>
+        <tr><td>Clientes</td><td>Id_Cliente</td><td>INT · PK · AUTO_INCREMENT</td><td>Identificador do cliente</td></tr><tr><td>Clientes</td><td>Nome</td><td>VARCHAR(100) · NOT NULL</td><td>Nome do cliente</td></tr><tr><td>Clientes</td><td>Documento</td><td>VARCHAR(14) · NOT NULL · único</td><td>CPF ou CNPJ</td></tr><tr><td>Clientes</td><td>Tipo_Pessoa</td><td>CHAR(2) · PF ou PJ</td><td>Tipo jurídico da pessoa</td></tr><tr><td>Cliente_Email</td><td>fk_Cliente</td><td>INT · FK · CASCADE</td><td>Cliente associado ao e-mail</td></tr><tr><td>Cliente_Email</td><td>Email</td><td>VARCHAR(150) · NOT NULL</td><td>E-mail, exclusivo em combinação com o cliente</td></tr><tr><td>Contratos</td><td>fk_Cliente</td><td>INT · FK · RESTRICT</td><td>Cliente contratante</td></tr><tr><td>Contratos</td><td>Valor_Total, Despesas_Contratante</td><td>DECIMAL(10,2)</td><td>Valores financeiros e despesas</td></tr><tr><td>Contratos</td><td>Status</td><td>VARCHAR(15)</td><td>aberto, concluido ou cancelado</td></tr>
       </tbody></table></div></article>
-      <article class="card table-card"><h2>Motorista, veículo, viagem e escala</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>TABELA</th><th>CAMPO</th><th>TIPO / REGRA</th><th>DESCRIÇÃO</th></tr></thead><tbody>
-        <tr><td>Motorista</td><td>cpf, cnh</td><td>VARCHAR(11) · único</td><td>Identificação do motorista</td></tr><tr><td>Veículo</td><td>placa, renavam</td><td>VARCHAR · único</td><td>Identificação do veículo</td></tr><tr><td>Viagem</td><td>saida, destino</td><td>VARCHAR(150)</td><td>Trecho da rota</td></tr><tr><td>Viagem</td><td>contrato_id, motorista_id, veiculo_id</td><td>INTEGER · FK</td><td>Registros relacionados</td></tr><tr><td>Escala</td><td>viagem_id</td><td>INTEGER · FK</td><td>Viagem relacionada</td></tr><tr><td>Escala</td><td>n_de_paradas, quilometragem</td><td>INTEGER / FLOAT</td><td>Dados do percurso</td></tr>
+      <article class="card table-card"><h2>Pagamentos, operações e relacionamentos</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>TABELA</th><th>CAMPO</th><th>TIPO / REGRA</th><th>DESCRIÇÃO</th></tr></thead><tbody>
+        <tr><td>Pagamentos</td><td>fk_Contrato, Valor, Metodo</td><td>INT · FK / DECIMAL / VARCHAR</td><td>Pagamento vinculado ao contrato</td></tr><tr><td>Motoristas</td><td>CPF, CNH</td><td>VARCHAR(11) · PK / único</td><td>Identificação do motorista</td></tr><tr><td>Veiculos</td><td>Placa, Renavam</td><td>VARCHAR · PK / único</td><td>Identificação e cadastro do veículo</td></tr><tr><td>Viagens</td><td>fk_Contrato</td><td>INT · FK · RESTRICT</td><td>Contrato executado pela viagem</td></tr><tr><td>Viagens</td><td>Origem, Destino, Km_Real</td><td>VARCHAR / DECIMAL(8,2)</td><td>Roteiro e distância real</td></tr><tr><td>Viagem_Motorista</td><td>fk_Viagem, fk_Motorista</td><td>PK composta · CASCADE / RESTRICT</td><td>Motoristas associados à viagem</td></tr><tr><td>Viagem_Veiculo</td><td>fk_Viagem, fk_Veiculo</td><td>PK composta · CASCADE / RESTRICT</td><td>Veículos associados à viagem</td></tr><tr><td>Escalas</td><td>fk_Viagem, Ordem</td><td>INT · FK / único por viagem</td><td>Parada ordenada da viagem</td></tr><tr><td>Escalas</td><td>Local, Quilometragem, Datas</td><td>VARCHAR / DECIMAL / DATETIME</td><td>Local e horário da escala</td></tr>
       </tbody></table></div></article>
     </section>
 
     <section class="page-section" data-page="scripts" hidden>
       <div class="page-heading"><p class="eyebrow">04 · PREPARAÇÃO</p><h1>Scripts de criação e carga</h1><p>Comandos simples para preparar o banco e iniciar a demonstração.</p></div>
       <div class="content-grid">
-        <article class="card"><span class="step">1</span><h2>Criar as tabelas</h2><p>As tabelas são criadas pelas migrações do Django.</p><pre>python manage.py migrate</pre><a class="text-link" href="{% static 'core/schema.sql' %}" download>Baixar o script SQL</a></article>
+        <article class="card"><span class="step">1</span><h2>Criar as tabelas</h2><p>O modelo físico define dez estruturas, incluindo pagamentos, contatos e associações N:N.</p><pre>CREATE TABLE Clientes ...</pre><a class="text-link" href="{% static 'core/schema.sql' %}" download>Baixar o script do modelo físico</a></article>
         <article class="card"><span class="step">2</span><h2>Carregar dados fictícios</h2><p>Insere os registros de exemplo no banco vazio. A carga não apaga nem duplica dados.</p><pre>python manage.py seed_demo</pre><button class="button button-primary" id="load-data-secondary">Carregar pela página</button></article>
       </div>
       <article class="card"><h2>Distribuição dos 100 registros</h2><div class="seed-grid"><span>10 clientes</span><span>15 contratos</span><span>20 motoristas</span><span>15 veículos</span><span>20 viagens</span><span>20 escalas</span></div></article>
@@ -119,7 +119,7 @@
       <article class="card">
         <ol class="presentation-list">
           <li><b>Apresente a proposta</b><span>Explique o problema de organizar dados de transporte.</span></li>
-          <li><b>Mostre a modelagem</b><span>Apresente as seis entidades e seus relacionamentos.</span></li>
+          <li><b>Mostre a modelagem</b><span>Apresente as dez estruturas físicas e seus relacionamentos.</span></li>
           <li><b>Carregue os dados</b><span>Use os 100 registros fictícios para popular o banco.</span></li>
           <li><b>Execute uma consulta</b><span>Exiba uma rota, um motorista ou os indicadores gerais.</span></li>
           <li><b>Encerre com as validações</b><span>Comente as chaves únicas e estrangeiras.</span></li>
