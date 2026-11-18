@@ -10,7 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,13 +22,28 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-a5hbs0-937kpxmk^0o2gl4&y3v+@eu4^s6834c7pu8afq74w8*'
+IS_VERCEL = "VERCEL" in os.environ
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    if IS_VERCEL:
+        raise ImproperlyConfigured(
+            "Configure DJANGO_SECRET_KEY in the Vercel project environment variables."
+        )
+    SECRET_KEY = "django-insecure-local-development-only"
 
-ALLOWED_HOSTS = []
+DEBUG = os.environ.get(
+    "DJANGO_DEBUG", "false" if IS_VERCEL else "true"
+).strip().lower() in {"1", "true", "yes"}
+
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+if IS_VERCEL:
+    ALLOWED_HOSTS.append(".vercel.app")
+ALLOWED_HOSTS.extend(
+    host.strip()
+    for host in os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",")
+    if host.strip()
+)
 
 
 # Application definition
@@ -116,7 +134,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
 # Email
